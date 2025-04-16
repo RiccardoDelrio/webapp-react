@@ -8,8 +8,19 @@ function GlobalProvider({ children }) {
     // SI FANNO LE CHIAMTE ALLE API PER PRENDERE I DATI CHE SERVONO A TUTTA L'APPLICAZIONE
     
     //  CHE SERVONO A TUTTA L'APPLICAZIONE E LE FUNZIONI PER MODIFICARLE
-    const [film, setFilm] = useState(null); // Esempio di variabile globale
-
+    const [film, setFilm] = useState(null); 
+    
+useEffect(() => {
+    fetch('http://localhost:3000/api/movies/')
+    .then(response => response.json())
+    .then(data => {
+        setFilm(data);
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}, []);
 
     return (
         <GlobalContext.Provider value={{
