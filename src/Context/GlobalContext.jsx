@@ -9,7 +9,8 @@ function GlobalProvider({ children }) {
     
     //  CHE SERVONO A TUTTA L'APPLICAZIONE E LE FUNZIONI PER MODIFICARLE
     const [film, setFilm] = useState(null); 
-    
+    const [idSelezionato, setIdSelezionato] = useState(null); // id del film selezionato
+const [filmSelezionato, setFilmSelezionato] = useState(null); // film selezionato
 useEffect(() => {
     fetch('http://localhost:3000/api/movies/')
     .then(response => response.json())
@@ -22,11 +23,26 @@ useEffect(() => {
     });
 }, []);
 
+useEffect(() => {
+    fetch(`http://localhost:3000/api/movies/${idSelezionato}`)
+    .then(response => response.json())
+    .then(data => {
+        setFilmSelezionato(data);
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}, [idSelezionato]);
     return (
         <GlobalContext.Provider value={{
         //QUI CI VANNO LE VARIABILI GLOBALI CHE VUOI SPOSARE PER TUTTA L'APPLICAZIONE E LE FUNZIONI PER MODIFICARLE
             film,
-            setFilm
+            setFilm,
+            idSelezionato, // aggiunto idSelezionato
+            setIdSelezionato, // aggiunto setIdSelezionato
+            filmSelezionato // aggiunto filmSelezionato
+             // aggiunto setFilmSelezionato
         }}>
             {children}
         </GlobalContext.Provider>
