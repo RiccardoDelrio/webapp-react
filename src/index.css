@@ -1,1 +1,8 @@
-@import "bootstrap"
+@import "bootstrap";
+
+.card_film{
+  min-height: 500px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+}

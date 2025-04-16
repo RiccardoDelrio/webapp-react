@@ -1,6 +1,6 @@
 import { useGlobal } from "../Context/GlobalContext"
 
-export default function Home() {
+export default function Details() {
     
     const { film } = useGlobal();
 
