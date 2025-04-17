@@ -16,7 +16,7 @@ export default function Home() {
             <div className="row g-4">
                 {film && film.map((movie) => (
                     <div className="col-md-4 mb-4" key={movie.id} onClick={() => handleMovieSelect(movie.id)}>
-                        <Link to="/details" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Link to={`/details?id=${movie.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                             <div className="card card_film">
                                 <img src={`http://localhost:3000/img/${movie.image}`} className="card-img-top" alt={movie.title} />
                                 <div className="card-body">
