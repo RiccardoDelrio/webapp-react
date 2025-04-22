@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react"; 
 
-const GlobalContext = createContext();
+export const GlobalContext = createContext();
 
-function GlobalProvider({ children }) {
+export const GlobalProvider = ({ children }) => {
     //QUI SI DICHIARANO
     //   LE VARIABILI GLOBALI
     // SI FANNO LE CHIAMTE ALLE API PER PRENDERE I DATI CHE SERVONO A TUTTA L'APPLICAZIONE
@@ -20,6 +20,7 @@ function GlobalProvider({ children }) {
         review: "",
         vote: 0,
     }); // dati del form per l'inserimento della recensione
+    const [isLoading, setIsLoading] = useState(false);
     
     const handleSetIdSelezionato = (id) => {
         setIdSelezionato(id);
@@ -78,58 +79,55 @@ function GlobalProvider({ children }) {
     };
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/movies/')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            setFilm(data);
-            console.log(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        setIsLoading(true);
+        
+        const fetchData = fetch('http://localhost:3000/api/movies/')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            });
+
+        const minDelay = new Promise(resolve => setTimeout(resolve, 2000));
+
+        Promise.all([fetchData, minDelay])
+            .then(([data]) => {
+                setFilm(data);
+                setIsLoading(false);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setIsLoading(false);
+            });
     }, []);
 
     useEffect(() => {
         if (!idSelezionato) return;
         
-        fetch(`http://localhost:3000/api/movies/${idSelezionato}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            setFilmSelezionato(data);
-            console.log(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }, [idSelezionato]);
+        setIsLoading(true);
+        
+        const fetchMovie = fetch(`http://localhost:3000/api/movies/${idSelezionato}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            });
 
-    useEffect(() => {
-        if (!idSelezionato) return;
 
-        fetch(`http://localhost:3000/api/movies/${idSelezionato}/reviews`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            setFormData(prev => ({...prev, movieId: idSelezionato}));
-            console.log(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        const minDelay = new Promise(resolve => setTimeout(resolve, 2000));
+
+        Promise.all([fetchMovie, minDelay])
+            .then(([data]) => {
+                setFilmSelezionato(data);
+                setFormData(prev => ({...prev, movieId: idSelezionato}));
+                setIsLoading(false);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setIsLoading(false);
+            });
     }, [idSelezionato]);
 
     return (
@@ -137,21 +135,22 @@ function GlobalProvider({ children }) {
         //QUI CI VANNO LE VARIABILI GLOBALI CHE VUOI SPOSARE PER TUTTA L'APPLICAZIONE E LE FUNZIONI PER MODIFICARLE
             film,
             setFilm,
-            idSelezionato, // aggiunto idSelezionato
+            idSelezionato, 
             setIdSelezionato: handleSetIdSelezionato, // Sostituisci con la nuova funzione
-            filmSelezionato, // aggiunto filmSelezionato
+            filmSelezionato,
             formData,
-            setFormData, // aggiunto setFormData
-            submitReview, // aggiunto submitReview
-            
+            setFormData, 
+            submitReview, 
+            isLoading,
+            setIsLoading
         }}>
             {children}
         </GlobalContext.Provider>
     );
-}
+};
 /// Custom hook to use the GlobalContext => va scritto cosi e basta
 function useGlobal() {
     return useContext(GlobalContext);
 }
 //ESPORTI ILPROVIDER CHE VA NELLE ROTTE E USE GLOBAL CHE SERVE PER RICHIAMARE LE VARIABILI GLOBALI NELLE VARIE PAGINE
-export { GlobalProvider, useGlobal };
+export { useGlobal };
